@@ -77,7 +77,10 @@ public class Dialect {
         if(pageBounds.getOrders() != null && !pageBounds.getOrders().isEmpty()){
             pageSQL = getSortString(sql, pageBounds.getOrders());
         }
-        if(pageBounds.getOffset() != RowBounds.NO_ROW_OFFSET
+        if(pageBounds.getPageGap() > 1)
+        {
+        	pageSQL = getLimitString(pageSQL, "__offset", pageBounds.getOffset(), "__limit",pageBounds.getLimit(), pageBounds.getPageGap());
+        }else if(pageBounds.getOffset() != RowBounds.NO_ROW_OFFSET
                 || pageBounds.getLimit() != RowBounds.NO_ROW_LIMIT){
             pageSQL = getLimitString(pageSQL, "__offset", pageBounds.getOffset(), "__limit",pageBounds.getLimit());
         }
@@ -116,6 +119,13 @@ public class Dialect {
      * 将sql变成分页sql语句
      */
     protected String getLimitString(String sql, String offsetName,int offset, String limitName, int limit) {
+        throw new UnsupportedOperationException("paged queries not supported");
+    }
+    
+    /**
+     * 将sql变成分页sql语句
+     */
+    protected String getLimitString(String sql, String offsetName,int offset, String limitName, int limit, int pageGap) {
         throw new UnsupportedOperationException("paged queries not supported");
     }
 

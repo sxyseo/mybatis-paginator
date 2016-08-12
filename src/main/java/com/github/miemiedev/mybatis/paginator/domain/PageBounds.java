@@ -18,24 +18,34 @@ public class PageBounds extends RowBounds implements Serializable {
     public final static int NO_PAGE = 1;
     /** 页号 */
     protected int page = NO_PAGE;
+    /** 尾页号 */
+	private int endPage;
     /** 分页大小 */
     protected int limit = NO_ROW_LIMIT;
+    /** 分页间隔 */
+    private int pageGap;
     /** 分页排序信息 */
     protected List<Order> orders = new ArrayList<Order>();
     /** 结果集是否包含TotalCount */
     protected boolean containsTotalCount;
 
     protected Boolean asyncTotalCount;
+	
+
 
     public PageBounds(){
         containsTotalCount = false;
     }
-
+    
     public PageBounds(RowBounds rowBounds) {
         if(rowBounds instanceof PageBounds){
             PageBounds pageBounds = (PageBounds)rowBounds;
             this.page = pageBounds.page;
             this.limit = pageBounds.limit;
+            if(pageBounds.page == 1 && pageBounds.pageGap != 0){
+            	this.limit = rowBounds.getLimit() * (pageBounds.endPage - pageBounds.page + 1);
+            }
+            this.endPage = pageBounds.endPage;
             this.orders = pageBounds.orders;
             this.containsTotalCount = pageBounds.containsTotalCount;
             this.asyncTotalCount = pageBounds.asyncTotalCount;
@@ -57,6 +67,16 @@ public class PageBounds extends RowBounds implements Serializable {
 
     public PageBounds(int page, int limit) {
         this(page, limit, new ArrayList<Order>(), true);
+    }
+    
+    //page为当前页，endPage为结束页, limit为 分页大小
+    public PageBounds(int page, int endPage, int limit) {
+    	this(page, endPage, limit, new ArrayList<Order>(), true);
+    }
+    
+    //page为当前页，endPage为结束页, limit为 分页大小
+    public PageBounds(int page, int endPage, int limit, Order order) {
+    	this(page, endPage, limit, new ArrayList<Order>(), true);
     }
 
     public PageBounds(int page, int limit, boolean containsTotalCount) {
@@ -94,6 +114,15 @@ public class PageBounds extends RowBounds implements Serializable {
         this.orders = orders;
         this.containsTotalCount = containsTotalCount;
     }
+    
+    public PageBounds(int page, int endPage, int limit, List<Order> orders, boolean containsTotalCount) {
+        this.page = page;
+        this.endPage = endPage;
+        this.limit = limit;
+        this.orders = orders;
+        this.pageGap = endPage - page + 1;
+        this.containsTotalCount = containsTotalCount;
+    }
 
 
     public int getPage() {
@@ -104,6 +133,15 @@ public class PageBounds extends RowBounds implements Serializable {
         this.page = page;
     }
 
+    
+    public int getEndPage() {
+        return endPage;
+    }
+
+    public void setEndPage(int endPage) {
+        this.endPage = endPage;
+    }
+    
     public int getLimit() {
         return limit;
     }
@@ -143,11 +181,19 @@ public class PageBounds extends RowBounds implements Serializable {
         }
         return 0;
     }
+    
+    public int getPageGap() {
+        if(page >= 1 && endPage > page){
+            return endPage - page + 1;
+        }
+        return 0;
+    }
 
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("PageBounds{");
         sb.append("page=").append(page);
+        sb.append(", endPage=").append(endPage);
         sb.append(", limit=").append(limit);
         sb.append(", orders=").append(orders);
         sb.append(", containsTotalCount=").append(containsTotalCount);

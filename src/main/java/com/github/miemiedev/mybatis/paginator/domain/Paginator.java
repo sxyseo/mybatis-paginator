@@ -22,6 +22,13 @@ public class Paginator implements Serializable {
      * 页数
      */
     private int page;
+    
+    /**
+     * 尾页
+     */
+    private int endPage;
+    
+    
     /**
      * 总记录数
      */
@@ -40,7 +47,14 @@ public class Paginator implements Serializable {
     public int getPage() {
         return page;
     }
-
+    
+    /**
+     * 取得尾页。
+     */
+    public int getEndPage() {
+        return endPage;
+    }
+    
     public int getLimit() {
         return limit;
     }
@@ -138,6 +152,12 @@ public class Paginator implements Serializable {
         return page > 0 ? (page - 1) * getLimit() : 0;
     }
 
+    /**
+     * pageGap，计数从0开始，可以用于mysql分页使用(0-based)
+     */
+    public int getPageGap() {
+        return endPage > page ? (endPage - page + 1) * getLimit() : 0;
+    }
 
 
     /**
@@ -237,6 +257,7 @@ public class Paginator implements Serializable {
         sb.append("Paginator");
         sb.append("{page=").append(page);
         sb.append(", limit=").append(limit);
+        sb.append(", endPage=").append(endPage);
         sb.append(", totalCount=").append(totalCount);
         sb.append('}');
         return sb.toString();
